@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.dmwnezes.radar/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity
+TotalTime: 5255
+WaitTime: 5301
+Complete

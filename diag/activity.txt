@@ -1,0 +1,1 @@
+    topResumedActivity=ActivityRecord{2c498a4 u0 com.dmwnezes.radar/.MainActivity t8}
