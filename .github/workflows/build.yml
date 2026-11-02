@@ -1,0 +1,58 @@
+name: Gerar APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "assinatura/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
+      RADAR_CHAVE: ${{ secrets.RADAR_CHAVE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Abrir chave de assinatura
+        run: |
+          if [ -z "$RADAR_CHAVE" ]; then
+            echo "::error::Falta o segredo RADAR_CHAVE em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          mkdir -p app/signing
+          gpg --batch --yes --quiet --pinentry-mode loopback --passphrase "$RADAR_CHAVE" \
+            -o app/signing/app.keystore -d assinatura/app.keystore.gpg
+
+      - name: Testar e compilar
+        run: ./gradlew testDebugUnitTest assembleRelease --no-daemon
+
+      - name: Renomear APK
+        run: cp app/build/outputs/apk/release/app-release.apk Radar.apk
+
+      - name: Publicar versão
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Radar 1.0.${{ github.run_number }}
+          body: ${{ github.event.head_commit.message }}
+          files: Radar.apk
+          make_latest: true
