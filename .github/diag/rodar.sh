@@ -9,7 +9,13 @@ sleep 6;  adb exec-out screencap -p > diag/t06.png
 sleep 14; adb exec-out screencap -p > diag/t20.png
 adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' > diag/activity.txt
 adb shell pidof com.dmwnezes.radar > diag/pid.txt
-sleep 25; adb exec-out screencap -p > diag/t45.png
+sleep 15; adb exec-out screencap -p > diag/t35.png
+TAM=$(adb shell wm size | grep -oE '[0-9]+x[0-9]+' | tail -1); L=${TAM%x*}; A=${TAM#*x}; echo "$TAM" > diag/tam.txt
+Y=$((A * 94 / 100))
+adb shell input tap $((L * 18 / 100)) $Y; sleep 3; adb exec-out screencap -p > diag/radar.png
+adb shell input tap $((L * 82 / 100)) $Y; sleep 3; adb exec-out screencap -p > diag/jogos.png
+adb shell input tap $((L / 2)) $Y; sleep 2
+adb shell input tap $((L / 2)) $((A * 30 / 100)); sleep 8; adb exec-out screencap -p > diag/detalhe.png
 adb shell pidof com.dmwnezes.radar >> diag/pid.txt
 adb logcat -d > diag/logcat.txt
 adb logcat -b crash -d > diag/crash.txt
